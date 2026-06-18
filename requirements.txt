@@ -1,0 +1,6 @@
+opencv-python
+ultralytics
+transformers
+moviepy
+scikit-image
+scikit-learn
