@@ -2,7 +2,21 @@
 
 This project watches a driving video from a car cam (a dashcam) and decides what the car should do next: `GO`, `SLOW DOWN`, `STOP`, or `EMERGENCY BRAKE`. It draws that decision on top of the video as a live on-screen display.
 
-<video src="data/output.mp4" controls></video>
+---
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <video src="https://github.com/user-attachments/assets/1ec120a0-c606-4ff4-9ed5-112f515052ce" controls width="100%"></video>
+    </td>
+    <td width="50%" align="center">
+      <video src="https://github.com/user-attachments/assets/89c5f5fa-2e61-4271-b154-36a667b92bf8" controls width="100%"></video>
+    </td>
+  </tr>
+</table>
+
+**[Watch the full demo on YouTube](https://www.youtube.com/watch?v=mKYMzkYYfiM)**
+
 ---
 
 
