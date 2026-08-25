@@ -1,12 +1,12 @@
 """
-Draw detection boxes colored by class group or light state.
+Draw detection boxes colored by class group.
 
 Pixel and font constants scale with frame width relative to REFERENCE_W.
 """
 
 import cv2
 
-from ego_vision.config.settings import GROUP_COLORS, LIGHT_COLORS
+from ego_vision.config.settings import GROUP_COLORS
 from ego_vision.viz.common import scale
 
 
@@ -21,16 +21,11 @@ def draw_detections(frame, detections, show_conf=True, show_distance=True):
     for det in detections:
         x1, y1, x2, y2 = (int(v) for v in det.box_xyxy)
 
-        if det.class_name == "traffic light" and det.light_state is not None:
-            color = LIGHT_COLORS.get(det.light_state, LIGHT_COLORS["unknown"])
-        else:
-            color = GROUP_COLORS.get(det.class_group, (255, 255, 255))
+        color = GROUP_COLORS.get(det.class_group, (255, 255, 255))
 
         cv2.rectangle(frame, (x1, y1), (x2, y2), color, box_thick)
 
         parts = [det.class_name]
-        if det.class_name == "traffic light" and det.light_state is not None:
-            parts.append(det.light_state.upper())
         if show_distance and det.distance_m is not None:
             parts.append(f"{det.distance_m:.1f}m")
         if show_conf:

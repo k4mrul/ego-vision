@@ -23,9 +23,6 @@ class HudState:
     frame_idx: int = 0
     proc_fps: float = 0.0
     recent_actions: list = field(default_factory=list)
-    light_ahead: str | None = None
-    speed_kmh: float | None = None
-    # System status panel
     track_count: int = 0
     device: str = ""
 
@@ -40,34 +37,6 @@ def draw_ego_zone(frame: np.ndarray, zone: np.ndarray) -> np.ndarray:
 
 
 def draw_debug_strip(frame: np.ndarray, hud: HudState) -> np.ndarray:
-    s = scale(frame)
-    h = frame.shape[0]
-    parts = []
-    if hud.speed_kmh is not None:
-        parts.append(f"speed:{hud.speed_kmh:5.1f} km/h")
-    if hud.light_ahead:
-        parts.append(f"light:{hud.light_ahead}")
-    if not parts:
-        return frame
-    text = "  |  ".join(parts)
-
-    font_scale = 0.7 * s
-    thickness = max(1, int(2 * s))
-    pad = max(2, int(10 * s))
-    margin = max(2, int(8 * s))
-    (tw, th), bl = cv2.getTextSize(text, FONT, font_scale, thickness)
-    y2 = h - margin
-    y1 = y2 - th - bl - 2 * pad
-
-    _translucent_panel(
-        frame, (margin, y1), (margin + tw + 2 * pad, y2),
-        alpha=0.7, border=True
-    )
-
-    cv2.putText(
-        frame, text, (margin + pad, y2 - pad - bl),
-        FONT, font_scale, (240, 240, 240), thickness, cv2.LINE_AA,
-    )
     return frame
 
 
@@ -88,18 +57,15 @@ def draw_status_panel(frame, hud):
     row_h_text = int(22 * s)
     dot_r = max(2, int(5 * s))
 
-    # Semi-transparent dark background with thin border.
     _translucent_panel(
         frame, (x0, y0), (x0 + panel_w, y0 + panel_h), 
         alpha=0.7, border=True
     )
 
-    # Header.
     cv2.putText(frame, "SYSTEMS", (x0 + pad_x, header_y),
                 FONT, 0.6 * s, (200, 200, 200), 1, cv2.LINE_AA)
     cv2.line(frame, (x0 + pad_x, div1_y), (x0 + panel_w - pad_x, div1_y), (60, 60, 60), 1)
 
-    # Status rows.
     items = [
         ("Detection", True),
         ("Tracking", True),
@@ -123,7 +89,6 @@ def draw_status_panel(frame, hud):
                     FONT, 0.5 * s, color, 1, cv2.LINE_AA)
         y += row_h
 
-    # Data rows: dividers act as separator markers in the same list.
     data_rows = [
         "divider",
         ("Device", hud.device),

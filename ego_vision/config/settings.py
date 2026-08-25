@@ -46,16 +46,6 @@ GROUP_COLORS: dict[str, tuple[int, int, int]] = {
     GROUP_CONTROL: (0, 255, 120),    # green, signals/signs
 }
 
-# Traffic light state colors (BGR).
-# Used when a light's color has been classified; overrides the
-# generic CONTROL color on that one box.
-LIGHT_COLORS: dict[str, tuple[int, int, int]] = {
-    "red": (0, 0, 255),
-    "yellow": (0, 220, 255),
-    "green": (0, 200, 0),
-    "unknown": (180, 180, 180),
-}
-
 # ---------------------------------------------------------------------------
 # Reasoning / decision layer
 # ---------------------------------------------------------------------------
@@ -81,9 +71,6 @@ EGO_NEAR_MARGIN_PX = 80
 # Lead-vehicle thresholds in meters.
 LEAD_STOP_DISTANCE_M  = 10.0   # <= this and in ego zone -> STOP
 LEAD_YIELD_DISTANCE_M = 40.0   # <= this and in ego zone -> YIELD
-
-# Emergency brake: any in-zone object with TTC below this triggers it.
-EMERGENCY_TTC_SEC = 2.0
 
 # Hysteresis: a new action must hold for N consecutive proposals to commit.
 HYSTERESIS_N = 5
@@ -119,7 +106,6 @@ OVERLAY_REFERENCE_WIDTH = 2400
 
 ACTION_COLORS_BGR: dict[str, tuple[int, int, int]] = {
     "STOP":            (0,   0, 200),
-    "EMERGENCY BRAKE": (0,   0, 255),
     "BRAKE":           (0,  60, 220),
     "YIELD":           (0, 200, 220),
     "SLOW DOWN":       (0, 200, 220),

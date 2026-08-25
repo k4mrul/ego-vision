@@ -14,14 +14,11 @@ from ego_vision.config.settings import (
 from ego_vision.decision.rule_engine import RuleEngine
 from ego_vision.ingest.video_reader import VideoReader
 from ego_vision.perception.detector import YoloDetector
-from ego_vision.perception.light_classifier import classify_light, crop_box
 from ego_vision.perception.depth_estimator import DepthEstimator
 from ego_vision.perception.inference_resizer import InferenceResizer
 from ego_vision.reasoning.distance import sample_distance
 from ego_vision.reasoning.ego_zone import make_ego_zone
 from ego_vision.reasoning.scene_state import assemble
-# from ego_vision.reasoning.speed import SpeedEstimator
-from ego_vision.reasoning.ttc import TtcEstimator
 from ego_vision.viz.hud import (
     HudState,
     draw_debug_strip,
@@ -91,8 +88,7 @@ def run(args):
     meta = reader.meta
     resizer = InferenceResizer(meta.width, meta.height, args.resize_width)
     ego_zone = make_ego_zone(meta.width, meta.height)
-    ttc_estimator = TtcEstimator(fps=meta.fps)
-    # speed_estimator = SpeedEstimator(fps=meta.fps)
+    print("Decision mode: distance-only (ego zone)")
 
     writer: cv2.VideoWriter | None = None
     if args.output is not None:
@@ -122,9 +118,6 @@ def run(args):
                 print(f"Detection took {time.time() - start_det:.2f} sec", flush=True)
                 for d in last_dets:
                     d.box_xyxy = resizer.scale_box_to_native(d.box_xyxy)
-                for det in last_dets:
-                    if det.class_name == "traffic light":
-                        det.light_state = classify_light(crop_box(frame, det.box_xyxy))
 
             if idx % args.depth_every == 0 or last_depth_map is None:
                 start_depth = time.time()
@@ -134,11 +127,6 @@ def run(args):
                 print(f"Depth estimation took {time.time() - start_depth:.2f} sec")
             for d in last_dets:
                 d.distance_m = sample_distance(last_depth_map, d.box_xyxy)
-            ttc_estimator.update(last_dets)
-
-            # speed estimation disabled.
-            # if speed_estimator is not None and last_depth_map is not None:
-            #     speed_mps = speed_estimator.update(last_dets, last_depth_map)
 
             scene = assemble(last_dets, frame.shape, ego_zone)
             action, reason = engine.decide(scene)
@@ -157,8 +145,6 @@ def run(args):
                 frame_idx=idx,
                 proc_fps=proc_fps,
                 recent_actions=engine.history,
-                light_ahead=scene.light_ahead,
-                speed_kmh=None,
                 track_count=sum(1 for d in last_dets if d.track_id is not None),
                 device=args.device,
             )

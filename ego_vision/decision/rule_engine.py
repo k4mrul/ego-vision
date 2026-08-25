@@ -1,10 +1,9 @@
 """Priority rule engine with hysteresis.
 
 Priority order (first match wins):
-  1. EMERGENCY BRAKE: TTC below the hard threshold
-  2. STOP: red light, stop sign, VRU in zone, or close lead vehicle
-  3. SLOW DOWN: yellow light, VRU near zone, or moderate-distance lead
-  4. GO: otherwise
+  1. STOP: any in-zone object within LEAD_STOP_DISTANCE_M
+  2. SLOW DOWN: any in-zone object within LEAD_YIELD_DISTANCE_M
+  3. GO: otherwise
 
 Hysteresis: a new action must hold for N consecutive proposals before it
 replaces the displayed one.
@@ -13,7 +12,6 @@ replaces the displayed one.
 from collections import deque
 
 from ego_vision.config.settings import (
-    EMERGENCY_TTC_SEC,
     HYSTERESIS_N,
     LEAD_STOP_DISTANCE_M,
     LEAD_YIELD_DISTANCE_M,
@@ -45,38 +43,11 @@ class RuleEngine:
 
     @staticmethod
     def _propose(scene) -> tuple[str, str]:
-        # Emergency Brake.
-        if (
-            scene.min_in_zone_ttc_sec is not None
-            and scene.min_in_zone_ttc_sec < EMERGENCY_TTC_SEC
-        ):
-            return ("EMERGENCY BRAKE", f"Time to Collision {scene.min_in_zone_ttc_sec:.1f}s")
-
-        # Stop.
-        if scene.vru_in_zone:
-            return ("STOP", f"{scene.vru_in_zone[0].class_name} in path")
-        if scene.stop_signs:
-            return ("STOP", "Stop sign ahead")
-        if scene.light_ahead == "red":
-            return ("STOP", "Red light")
-        if (
-            scene.lead_vehicle is not None
-            and scene.lead_distance_m is not None
-            and scene.lead_distance_m <= LEAD_STOP_DISTANCE_M
-        ):
-            return ("STOP", f"Lead vehicle {scene.lead_distance_m:.1f}m")
-
-        # Slow down.
-        if scene.light_ahead == "yellow":
-            return ("SLOW DOWN", "Yellow light")
-        if scene.vru_near_zone:
-            return ("SLOW DOWN", f"{scene.vru_near_zone[0].class_name} approaching")
-        if (
-            scene.lead_vehicle is not None
-            and scene.lead_distance_m is not None
-            and scene.lead_distance_m <= LEAD_YIELD_DISTANCE_M
-        ):
-            return ("SLOW DOWN", f"Lead vehicle {scene.lead_distance_m:.1f}m")
-
-        # Go.
+        if scene.min_in_zone_distance_m is not None:
+            d = scene.min_in_zone_distance_m
+            cls = scene.closest_in_zone.class_name if scene.closest_in_zone else "object"
+            if d <= LEAD_STOP_DISTANCE_M:
+                return ("STOP", f"{cls} at {d:.1f}m in path")
+            if d <= LEAD_YIELD_DISTANCE_M:
+                return ("SLOW DOWN", f"{cls} at {d:.1f}m ahead")
         return ("GO", "Path clear")

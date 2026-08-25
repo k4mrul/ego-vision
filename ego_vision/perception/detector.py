@@ -18,9 +18,7 @@ class Detection:
     box_xyxy: tuple[float, float, float, float]
     confidence: float
     track_id: int | None = None
-    light_state: str | None = None
     distance_m: float | None = None
-    ttc_sec: float | None = None
 
 
 class YoloDetector:
