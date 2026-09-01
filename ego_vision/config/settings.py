@@ -51,19 +51,21 @@ GROUP_COLORS: dict[str, tuple[int, int, int]] = {
 # ---------------------------------------------------------------------------
 
 # Ego zone is a symmetric trapezoid in front of the car,
-# built from four scalars (all normalized).
+# built from four normalized scalars.
 #
 #                center
 #                  |
-#       top_y  +---+---+         (top edge)
+#       top_y  +---+---+         (top edge, far away on road)
 #              |       |
 #              |       |
-#         1.0  +-------+         (bottom edge, at the camera)
-#              |<----->|         width = bottom_width (fraction of frame width)
-EGO_ZONE_CENTER       = 0.50  # vanishing-point x as fraction of width
-EGO_ZONE_BOTTOM_WIDTH = 0.32  # bottom edge width as fraction of frame width
-EGO_ZONE_TOP_WIDTH    = 0.06  # top edge width
-EGO_ZONE_TOP_Y        = 0.78  # y of the top edge (smaller = reaches higher)
+#  bottom_y +---+---+            (bottom edge, at the bonnet / street start)
+#              |<----->|
+#            bottom_width
+EGO_ZONE_CENTER       = 0.50   # horizontal center as fraction of width
+EGO_ZONE_BOTTOM_WIDTH = 0.32   # bottom edge width as fraction of frame width
+EGO_ZONE_TOP_WIDTH    = 0.06   # top edge width (narrow = far away)
+EGO_ZONE_TOP_Y        = 0.60   # top edge Y (smaller = reaches higher toward horizon)
+EGO_ZONE_BOTTOM_Y     = 0.73   # bottom edge Y (at the bonnet edge where street starts)
 
 # Outside-but-within this many pixels of the zone counts as "near".
 EGO_NEAR_MARGIN_PX = 80

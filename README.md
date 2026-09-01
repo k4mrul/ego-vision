@@ -61,8 +61,14 @@ You can adjust the numbers in [`ego_vision/config/settings.py`](ego_vision/confi
 | `BEV_LATERAL_SCALE` | `1.15` | Bird's-eye-view lateral conversion factor (assumes ~60 deg dashcam FOV) |
 | `BEV_MAX_RANGE_M` | `50.0` | How far ahead the bird's-eye mini-map looks |
 
-The `EGO_ZONE_*` settings in the same file control the size and shape of the path-ahead
-area shown on screen.
+The `EGO_ZONE_*` settings in the same file control the size and shape of the path-ahead area shown on screen. The key ones:
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `EGO_ZONE_TOP_Y` | `0.78` | Top edge y (smaller = reaches higher toward horizon) |
+| `EGO_ZONE_BOTTOM_Y` | `0.92` | Bottom edge y (1.0 = car bonnet; lower = street level) |
+| `EGO_ZONE_TOP_WIDTH` | `0.06` | Top edge width (narrow = far away) |
+| `EGO_ZONE_BOTTOM_WIDTH` | `0.32` | Bottom edge width (wide = close to car) |
 
 ## Installation
 

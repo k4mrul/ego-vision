@@ -9,6 +9,7 @@ import numpy as np
 from ego_vision.config.settings import (
     EGO_NEAR_MARGIN_PX,
     EGO_ZONE_BOTTOM_WIDTH,
+    EGO_ZONE_BOTTOM_Y,
     EGO_ZONE_CENTER,
     EGO_ZONE_TOP_WIDTH,
     EGO_ZONE_TOP_Y,
@@ -23,12 +24,13 @@ def make_ego_zone(
     bottom_width=EGO_ZONE_BOTTOM_WIDTH,
     top_width=EGO_ZONE_TOP_WIDTH,
     top_y=EGO_ZONE_TOP_Y,
+    bottom_y=EGO_ZONE_BOTTOM_Y,
 ):
     bw = bottom_width / 2.0
     tw = top_width / 2.0
     pts_norm = [
-        (center - bw, 1.00),
-        (center + bw, 1.00),
+        (center - bw, bottom_y),
+        (center + bw, bottom_y),
         (center + tw, top_y),
         (center - tw, top_y),
     ]
